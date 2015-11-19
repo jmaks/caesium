@@ -2,7 +2,7 @@
 
 Клиент для **ii** (http://ii-net.tk/), написанный на `python3` с интерфейсом на `ncurses`.
 
-![Screenshot of ii-caesium](https://raw.githubusercontent.com/jmaks/caesium/master/screenshot/ii-caesium.png)
+![Screenshot of caesium](https://raw.githubusercontent.com/jmaks/caesium/master/screenshot/caesium-ii.png)
 
 ####Конфигурационный файл
 
