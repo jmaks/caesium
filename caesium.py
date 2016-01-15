@@ -13,6 +13,18 @@ counts = []
 counts_rescan = True
 next_echoarea = False
 
+splash = ["  ______ ______ ______ ______ _____ _    _ _________",
+          "/|  ____|  __  |  __  |  ____|_   _| | /| |  _   _  \\",
+          "|| |___/| |__| | |__| | |____//| ||| | || | |/| |/| |",
+          "|| |   ||  __  |  ____|____  ||| ||| | || | ||| ||| |",
+          "|| |____| | || | |____/____| |_| |_| |__| | ||| ||| |",
+          "||______|_| ||_|______|______|_____|______|_|||_|||_|",
+          "|/______/_/ /__/______/______/_____/______/_/|/_/|/_/",
+          "           ncurses ii-client         v.0.1",
+          "           Andrew Lobanov       13.01.2016",
+          "",
+          "                    Press any key"]
+
 def check_directories():
     if not os.path.exists("echo"):
         os.mkdir("echo")
@@ -36,7 +48,7 @@ def separate(l, step=20):
         yield l[x:x+step]
 
 def load_config():
-    global nodes, editor, color_theme
+    global nodes, editor, color_theme, show_splash
     first = True
     node = {}
     echoareas = []
@@ -78,6 +90,8 @@ def load_config():
             editor = " ".join(param[1:])
         elif param[0] == "theme":
             color_theme = param[1]
+        elif param[0] == "nosplash":
+            show_splash = False
     if not "nodename" in node:
         node["nodename"] = "untitled node"
     if not "to" in node:
@@ -213,13 +227,16 @@ def fetch_mail():
             if echo[0] in nodes[node]["clone"]:
                 if os.path.exists("echo/" + echo[0]):
                     os.remove("echo/" + echo[0])
-                msg_list = [x for x in remote_msg_list if x not in get_local_msg_list(echo) and x != ""]
+                local_msg_list = get_local_msg_list(echo)
+                msg_list = [x for x in remote_msg_list if x not in local_msg_list and x != ""]
                 nodes[node]["clone"].remove(echo[0])
                 lasts[echo[0]] = -1
             elif os.path.exists("echo/full/" + echo[0]):
-                msg_list = [x for x in remote_msg_list if x not in get_local_full_msg_list(echo) and x != ""]
+                local_msg_list = get_local_full_msg_list(echo)
+                msg_list = [x for x in remote_msg_list if x not in local_msg_list and x != ""]
             else:
-                msg_list = [x for x in remote_msg_list[-51:] if x not in get_local_full_msg_list(echo) and x != ""]
+                local_msg_list = get_local_full_msg_list(echo)
+                msg_list = [x for x in remote_msg_list[-51:] if x not in local_msg_list and x != ""]
                 if not len(msg_list) == 1:
                     msg_list.append("")
                 for msgid in remote_msg_list:
@@ -350,6 +367,17 @@ echo_cursor = 0
 archive_cursor = 0
 width = 0
 height = 0
+show_splash = True
+
+def splash_screen():
+    stdscr.clear()
+    x = int((width - len(splash[1])) / 2) - 1
+    y = int((height - len(splash)) / 2)
+    i = 0
+    for line in splash:
+        stdscr.addstr(y + i, x, line, curses.color_pair(4))
+        i = i + 1
+    stdscr.getch()
 
 def get_term_size():
     global width, height
@@ -928,7 +956,7 @@ def echo_reader(echo, last, archive, favorites):
                     f.write("Re: " + msg[6] + "\n")
                 else:
                     f.write(msg[6] + "\n")
-                rr = re.compile(r"^[a-zA-Zа-ЯА-Я0-9_-]{0,20}>{1,20}")
+                rr = re.compile(r"^[a-zA-Zа-яА-Я0-9_-]{0,20}>{1,20}")
                 for line in msg[8:]:
                     if line.strip() != "":
                         if rr.match(line):
@@ -984,6 +1012,8 @@ stdscr.keypad(True)
 
 stdscr.bkgd(" ", curses.color_pair(1))
 get_term_size()
+if show_splash:
+    splash_screen()
 echo_selector()
 curses.echo()
 curses.curs_set(True)
