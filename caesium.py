@@ -103,7 +103,7 @@ def load_config():
 
 def load_colors():
     global bold
-    colors = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
+    colors = ["black", "gray", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
 
     theme = open("themes/" + color_theme + ".cfg", "r").read().split("\n")
     for line in theme:
@@ -417,7 +417,7 @@ def rescan_counts(echoareas):
     for echo in echoareas:
         try:
             echocount = len(open("echo/" + echo[0], "r").read().split("\n")) - 1
-            if echo[0] in lasts: 
+            if echo[0] in lasts:
                 last = echocount - lasts[echo[0]]
                 if echocount == 0 and lasts[echo[0]] == 0:
                     last = 1
